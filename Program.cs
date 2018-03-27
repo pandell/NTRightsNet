@@ -37,7 +37,7 @@ namespace NTRightsNet
             if (!Program.AllCommands.TryGetValue(commandSpec, out var command)) { command = Program.CommandNotFound; }
 
             // run command and display its result
-            var result = command(args);
+            var result = command(sanitizedArgs);
             switch (result)
             {
                 case Success<string> s:
