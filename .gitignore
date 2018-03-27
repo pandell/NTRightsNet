@@ -1,0 +1,9 @@
+/*.sln.*
+!/*.sln.DotSettings
+/.vs
+/_*
+
+*.dotCover
+*.user
+bin
+obj
