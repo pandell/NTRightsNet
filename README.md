@@ -5,5 +5,5 @@ Command-line Windows application to get, add or remove rights for the specified 
 To build:
 
 ```
-dotnet build -c Release
+dotnet build --configuration Release --verbosity Normal
 ```
