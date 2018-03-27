@@ -1,0 +1,8 @@
+/*.sln.*
+/.vs
+/_*
+
+*.dotCover
+*.user
+bin
+obj

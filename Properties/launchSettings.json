@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Get Version": {
+      "commandName": "Project",
+      "commandLineArgs": "version"
+    }
+  }
+}
