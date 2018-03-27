@@ -34,7 +34,7 @@ namespace NTRightsNet
             // determine command to run
             var sanitizedArgs = args?.Select(a => a?.Trim() ?? string.Empty).ToArray() ?? new string[0];
             var commandSpec = sanitizedArgs.Length < 1 ? string.Empty : sanitizedArgs[0];
-            if (!Program.Command.TryGetValue(commandSpec, out var command)) { command = Program.CommandNotFound; }
+            if (!Program.AllCommands.TryGetValue(commandSpec, out var command)) { command = Program.CommandNotFound; }
 
             // run command and display its result
             var result = command(args);
@@ -65,7 +65,7 @@ namespace NTRightsNet
         /// <summary>
         /// Defines recognized commands.
         /// </summary>
-        private static readonly Dictionary<string, Func<string[], Result<string>>> Command = new Dictionary<string, Func<string[], Result<string>>>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, Func<string[], Result<string>>> AllCommands = new Dictionary<string, Func<string[], Result<string>>>(StringComparer.OrdinalIgnoreCase)
         {
             { string.Empty, Program.CommandUsage },
             { "help", Program.CommandUsage },
@@ -88,6 +88,16 @@ namespace NTRightsNet
 
 
         //--------------------------------------------------
+        private const string AllCommandsUsage = "&darkGray;Gets, adds or removes rights for the specified account.\n"
+            + "Usage:\n"
+            + "  NTRightsNet help\n"
+            + "  NTRightsNet version\n"
+            + "  NTRightsNet get [username]\n"
+            + "  NTRightsNet add [username] [semicolonSeparatedRights]\n"
+            + "  NTRightsNet remove [username] [--all|semicolonSeparatedRights]";
+
+
+        //--------------------------------------------------
         /// <summary>
         /// Adds rights for the specified user.
         /// </summary>
@@ -96,7 +106,7 @@ namespace NTRightsNet
             // verify arguments
             if (args.Length != 3)
             {
-                return new Failure<string>($"Expected exactly 2 parameters, username and semicolonSeparatedRights\n\n{((Success<string>)Program.CommandUsage(args)).Value}");
+                return new Failure<string>($"Expected exactly 2 parameters, username and semicolonSeparatedRights\n\n{Program.AllCommandsUsage}");
             }
 
             // verify that the specified account exists
@@ -163,7 +173,7 @@ namespace NTRightsNet
             // verify arguments
             if (args.Length != 2)
             {
-                return new Failure<string>($"Expected exactly 1 parameter, username\n\n{((Success<string>)Program.CommandUsage(args)).Value}");
+                return new Failure<string>($"Expected exactly 1 parameter, username\n\n{Program.AllCommandsUsage}");
             }
 
             // verify that the specified account exists
@@ -238,7 +248,7 @@ namespace NTRightsNet
         /// </summary>
         [NotNull] private static Result<string> CommandNotFound([NotNull, ItemNotNull] string[] args)
         {
-            return new Failure<string>($"Unknown command \"{args[0]}\".\n\n{((Success<string>)Program.CommandUsage(args)).Value}");
+            return new Failure<string>($"Unknown command \"{args[0]}\".\n\n{Program.AllCommandsUsage}");
         }
 
 
@@ -251,7 +261,7 @@ namespace NTRightsNet
             // verify arguments
             if (args.Length != 3)
             {
-                return new Failure<string>($"Expected exactly 2 parameters, username and semicolonSeparatedRights\n\n{((Success<string>)Program.CommandUsage(args)).Value}");
+                return new Failure<string>($"Expected exactly 2 parameters, username and semicolonSeparatedRights\n\n{Program.AllCommandsUsage}");
             }
 
             // verify that the specified account exists
@@ -298,7 +308,7 @@ namespace NTRightsNet
                     })
                     .ToArray());
 
-                var addStatus = NativeMethods.LsaNtStatusToWinError(
+                var removeStatus = NativeMethods.LsaNtStatusToWinError(
                     NativeMethods.LsaRemoveAccountRights(policyHandle, sid, removeAll, rights, rights == null ? 0 : (uint)rights.Length));
 
                 // ReSharper disable once InvertIf - bad R# suggestion, makes code less readable
@@ -310,11 +320,11 @@ namespace NTRightsNet
                     }
                 }
 
-                return (addStatus == 0
+                return (removeStatus == 0
                     ? (Result<string>)new Success<string>(removeAll
-                        ? "&darkGray;Specified rights were successfully removed"
-                        : "&darkGray;All rights were successfully removed")
-                    : new Failure<string>("Unable to remove user rights", addStatus));
+                        ? "&darkGray;All rights were successfully removed"
+                        : "&darkGray;Specified rights were successfully removed")
+                    : new Failure<string>("Unable to remove user rights", removeStatus));
             }
         }
 
@@ -325,13 +335,7 @@ namespace NTRightsNet
         /// </summary>
         [NotNull] private static Result<string> CommandUsage([NotNull, ItemNotNull] string[] args)
         {
-            return new Success<string>("&darkGray;Gets, adds or removes rights for the specified account.\n"
-                + "Usage:\n"
-                + "  NTRightsNet help\n"
-                + "  NTRightsNet version\n"
-                + "  NTRightsNet get [username]\n"
-                + "  NTRightsNet add [username] [semicolonSeparatedRights]\n"
-                + "  NTRightsNet remove [username] [--all|semicolonSeparatedRights]");
+            return new Success<string>(Program.AllCommandsUsage);
         }
 
 
