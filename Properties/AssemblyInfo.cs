@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.MainAssembly)]
 
 [assembly: AssemblyVersion("1.0.0.0")] // for more discussion on versioning see http://stackoverflow.com/questions/62353/what-are-the-best-practices-for-using-assembly-attributes (and its followup)
-[assembly: AssemblyFileVersion("1.0.0.7")]
+[assembly: AssemblyFileVersion("1.0.0.9")]
 [assembly: AssemblyInformationalVersion("1.0.0")]
 [assembly: AssemblyProduct("NTRightsNet v1.0.0 "
 #if DEBUG
